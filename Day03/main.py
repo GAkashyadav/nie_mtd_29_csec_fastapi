@@ -127,7 +127,7 @@ def login(form_data : OAuth2PasswordRequestForm = Depends()):
 
 # ... tickets
 @app.post("/tickets", status_code=201, response_model=TicketResponse)
-def tickets_create(payload : TicketCreate,  current_user=Depends(require_roles(1,2,3,4)) ):
+def tickets_create(payload : TicketCreate,  current_user=Depends(require_roles(2,3,4,1)) ):
     ticket_dict = payload.model_dump()
     result = ticket_collection.insert_one(ticket_dict)
     new_ticket = ticket_collection.find_one({"_id" : result.inserted_id})
@@ -140,7 +140,7 @@ def tickets_read_all(current_user=Depends(require_roles(1, 2, 3, 4))):
     return tickets 
 
 @app.get("/tickets/{id}", response_model=TicketResponse)
-def ticket_read_by_id(id: str,  current_user=Depends(require_roles(1, 2, 3, 4))):
+def ticket_read_by_id(id: str,  current_user=Depends(require_roles(2,3,4,1))):
     if not ObjectId.is_valid(id):
         raise HTTPException(status_code=400, detail="Invalid ticket ID format")
     ticket_result = ticket_collection.find_one({"_id": ObjectId(id)})
@@ -149,7 +149,7 @@ def ticket_read_by_id(id: str,  current_user=Depends(require_roles(1, 2, 3, 4)))
     return ticket_helper(ticket_result)
 
 @app.put("/tickets/{id}", response_model=TicketResponse)
-def ticket_update(id: str, payload : TicketCreate,  current_user=Depends(require_roles(2, 3, 4))):
+def ticket_update(id: str, payload : TicketCreate,  current_user=Depends(require_roles(3,4,1))):
     if not ObjectId.is_valid(id):
         raise HTTPException(status_code=400, detail="Invalid ticket ID format")
     result = ticket_collection.update_one({"_id": ObjectId(id)}, {"$set": payload.model_dump()})
